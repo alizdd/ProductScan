@@ -7,7 +7,7 @@ contract ProductScan is Ownership {
     //ürünler
     Product[] private products;
     //Satıcılar
-    SellerInfo[] private sellers;
+    //SellerInfo[] private sellers;
 
     //Ürün
     struct Product {
@@ -22,13 +22,12 @@ contract ProductScan is Ownership {
 
 
     //Satıcı
-    struct SellerInfo {
-        uint256 reportCount;
-        string name;
-        string details;
-    }
+    // struct SellerInfo {
+    //     uint256 reportCount;
+    //     string name;
+    //     string details;
+    // }
 
-    mapping(bytes32 => bool) public vProducts;
 
     constructor(){
  
@@ -37,7 +36,7 @@ contract ProductScan is Ownership {
 
 
     //Mapping kısmı
-    mapping(address => uint256) sellerAddressToSellerIndex;
+    //mapping(address => uint256) sellerAddressToSellerIndex;
 
     mapping(uint256 => uint256) private productIdToProductIndex;
 
@@ -85,17 +84,24 @@ contract ProductScan is Ownership {
         require(isSold == false, "product is already sold");
         _;
     }
+
     // modifier onlySideContract() {
     //     require(msg.sender == sideContract, "You are not side contract");
     //     require(sideContract != address(0), "side contract is not set yet");
     //     _;
     // }
 
+    // function getAllProducts() public view returns (Product[] memory){
+    //     require(products.length > 0, "There are no products");
 
-    function getAllProducts() public view returns (Product[] memory) {
+    //     return products;
+    // }
+
+
+    function getAllOwnedProducts() public view returns (Product[] memory) {
         uint256 productCount = ownerProductCount[msg.sender];
         //Ürün var mı?
-        require(productCount > 0, "No products");
+        require(productCount > 0, "You have no products");
 
         // push method not available for memory array...
         Product[] memory ownedProducts = new Product[](productCount);
@@ -180,13 +186,39 @@ contract ProductScan is Ownership {
         // Ürün satın alındı olarak işaretlenir.
         products[productIndex].isSold = true;
         productToOwner[productId] = address(0);
-        // Ürün satıcısı sayısı azaltılır
+        // Ürün satıcısının ürün sayısı azaltılır
         ownerProductCount[productOwner]--;
 
         emit productPurchasedByConsumer(productId, msg.sender);
 
         return true;
     }
+
+
+    // should be called for reselling
+    function sellProduct(uint256 _productId, address _buyerAddress)
+        external
+        sellerCheck(_productId)
+        soldCheck(_productId)
+        returns (bool)
+    {
+        // checking for limit
+        //cannot sell to himself
+        require(msg.sender != _buyerAddress, "You already own this product");
+        require(ownerProductCount[msg.sender] > 0, "You own 0 product");
+
+        // changing owner of product here
+        productToOwner[_productId] = _buyerAddress;
+
+        // changing limit
+        ownerProductCount[msg.sender]--;
+        ownerProductCount[_buyerAddress]++;
+
+        emit productSoldSuccessfully(_productId, msg.sender, _buyerAddress);
+
+        return true;
+    }
+    
 
 
     function productDetails(uint256 _productId)
@@ -208,6 +240,16 @@ contract ProductScan is Ownership {
             return ("NA", 0, false, "Fake");
         }
         
+    }
+
+
+    function productLength()
+        public
+        view
+        onlyOwner
+        returns (uint256 _productArrayLength)
+    {
+        return products.length;
     }
 
 }
