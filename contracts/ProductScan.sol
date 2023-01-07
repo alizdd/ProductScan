@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.4.22 <0.9.0;
+pragma solidity ^0.8.13;
 import "./Ownership.sol";
 
 contract ProductScan is Ownership {
@@ -30,6 +30,7 @@ contract ProductScan is Ownership {
 
 
     constructor(){
+        products.push(Product(0, 0, "Dummy Data", false, "Dummy Data For initialize", 10));
  
         emit constructorSet(msg.sender);
     }
@@ -47,6 +48,7 @@ contract ProductScan is Ownership {
     mapping(uint256 => bool) productIdUsedForReport;
 
     mapping(uint256 => address) private productToOwner;
+    
 
 
     //Eventler
@@ -124,7 +126,7 @@ contract ProductScan is Ownership {
         string memory _name,
         string memory _details,
         uint _productionDate
-    ) external onlyOwner returns (bool) {
+    ) external returns (bool) {
         //Product ID daha önce kullanıldı mı?
         require(
             productIdToProductIndex[_productId] == 0,
@@ -148,7 +150,6 @@ contract ProductScan is Ownership {
         // uint productionDate;
         products.push(Product(_productId, _price, _name, false, _details, _productionDate));
 
-        // allProd[msg.sender].push(Product(_productId, _price, _name, _details, false));
         //setting index in mappings
         productIdToProductIndex[_productId] = products.length - 1;
         secretIdToProductIndex[_secretId] = products.length - 1;
@@ -171,23 +172,31 @@ contract ProductScan is Ownership {
         // product current owner from productId
         address productOwner = productToOwner[productId];
 
+
+        //Böyle bir ürün var mı yok mu?
+        require(
+            productOwner != address(0x0),
+            "There is no product with the given secretId"
+        );
+
         //Satışta bir ürün var mı yok mu?
         require(
             ownerProductCount[productOwner] > 0,
-            "seller product count is 0"
+            "Seller product count is 0"
         );
 
         //Ürün satın alındı mı?
         require(
             products[productIndex].isSold == false,
-            "Secret id is scanned before"
+            "Product is already sold, Secret id is scanned before"
         );
 
         // Ürün satın alındı olarak işaretlenir.
         products[productIndex].isSold = true;
-        productToOwner[productId] = address(0);
+        productToOwner[productId] = msg.sender;
         // Ürün satıcısının ürün sayısı azaltılır
         ownerProductCount[productOwner]--;
+        ownerProductCount[msg.sender]++;
 
         emit productPurchasedByConsumer(productId, msg.sender);
 
@@ -202,13 +211,25 @@ contract ProductScan is Ownership {
         soldCheck(_productId)
         returns (bool)
     {
-        // checking for limit
-        //cannot sell to himself
+
+        address productOwner = productToOwner[_productId];
+
+        //Böyle bir ürün var mı yok mu?
+        require(
+            productOwner != address(0x0),
+            "There is no product with the given secretId"
+        );
+        //Kullanıcı kendine ürün satamaz
         require(msg.sender != _buyerAddress, "You already own this product");
         require(ownerProductCount[msg.sender] > 0, "You own 0 product");
 
-        // changing owner of product here
+        uint256 productIndex = productIdToProductIndex[_productId];
+
+
+        //Ürünün yeni sahibi tanımlanır ve satıldı olarak işaretlenir
+        products[productIndex].isSold = true;
         productToOwner[_productId] = _buyerAddress;
+        
 
         // changing limit
         ownerProductCount[msg.sender]--;
@@ -226,18 +247,21 @@ contract ProductScan is Ownership {
         view
         returns (
             string memory name,
+            string memory details,
             uint256 price,
             bool isSold,
-            bytes32 isOriginal
+            string memory isOriginal
         )
     {
         uint256 index = productIdToProductIndex[_productId];
         Product memory tP = products[index];
-        if(index != 0){
-            return (tP.name, tP.price, tP.isSold, "Original");
+        address ownerAddress = productToOwner[_productId];
+
+        if(ownerAddress != address(0x0)){
+            return (tP.name, tP.details, tP.price, tP.isSold, "Original");
         }
         else{
-            return ("NA", 0, false, "Fake");
+            return ("NA", "NA", 0, false, "Fake");
         }
         
     }
