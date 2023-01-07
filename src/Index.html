@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Web 3 Bagış</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <script src='abi.js'></script>
+
+    <script src='node_modules/web3/dist/web3.min.js'></script>
+    <script src='node_modules/html5-qrcode/html5-qrcode.min.js'></script>
+    <script src='node_modules/jquery/dist/jquery.min.js'></script>
+    <script src='node_modules/jquery/dist/jquery.slim.min.js'></script>
+    <script src='node_modules/bootstrap/dist/js/bootstrap.min.js'></script>
+
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+
+<style>
+    .panel, .panel-body, .panel-footer, .panel-heading  {
+        padding: 15px;
+      }
+</style>
+</head>
+<body>
+    <div class="container">
+        <div class="alert alert-success" role="alert"> Status: <span id="status">Loading...</span></div>
+        <div class="row">
+            <div class="panel panel-info" style="width:100%">
+                <div class="panel-heading">
+                    <h3>Sözleşmeye Ürün Ekleyin</h3>
+                </div>
+                <div class="panel-body">
+                    <form id="AddNewProduct">
+                        <div class="col-2"><label for="ProductId">Ürün Id:</label></div>
+                        <div class="col-10"><input type="text" id="ProductId" name="ProductId"><br></div>
+                        
+                        
+                        <div class="col-2"><label for="ProductName">Ürün Adı:</label></div>
+                        <div class="col-10"><input type="text" id="ProductName" name="ProductName"><br></div>
+                        
+                        
+                        <div class="col-2"><label for="ProductDetails">Ürün Detayı:</label></div>
+                        <div class="col-10"><input type="text" id="ProductDetails" name="ProductDetails"><br></div>
+                        
+                        
+                        <div class="col-2"><label for="ProductPrice">Ürün Ücreti($):</label></div>
+                        <div class="col-10"><input type="text" placeholder="$" id="ProductPrice" name="ProductPrice"><br></div>
+                        
+                        <br>
+                        <input class="btn btn-success" type="submit" value="Onayla">
+                      </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+
+<script type="text/javascript" async>
+    //WEB3 INIT
+    load();
+
+    async function loadWeb3() {
+        //Metamask cüzdanını aktifleştirir
+        if (window.ethereum) {
+            window.web3 = new Web3('HTTP://127.0.0.1:9545');
+            window.ethereum.enable();
+        }
+    }
+
+    async function loadContract() {
+        return await new window.web3.eth.Contract(abi, '0x6e62D040D38637D8bd5B4a20d5083Df0d3F1b2B4');
+    }
+
+    async function load() {
+        await loadWeb3();
+        window.contract = await loadContract();
+        console.log("window.contract");
+        console.log(window.contract);
+        await updateStatus('Ready!');
+    }
+
+    async function updateStatus(status) {
+        const statusEl = document.getElementById('status');
+        statusEl.innerHTML = status;
+        console.log(status);
+        await changeAlert(true);
+    }
+
+    //Status divinin cssi güncellenir
+    async function changeAlert(isSuccess){
+        if($("[role='alert']").hasClass("alert-success")){
+            if(isSuccess){
+                return;
+            }
+            $("[role='alert']").removeClass("alert-success");
+            $("[role='alert']").addClass("alert-danger");
+        }
+        else{
+            if(!isSuccess){
+                return;
+            }
+            $("[role='alert']").addClass("alert-success");
+            $("[role='alert']").removeClass("alert-danger");
+        }
+    }
+</script>
+
+<script>
+    $(document).ready(function(){
+            var $formAdd=$('#AddNewProduct');
+
+            console.log($formAdd);
+            $formAdd.submit(function(e){
+                e.preventDefault();
+
+                var inputValues = $formAdd.serializeArray();
+                if(inputValues[0].value == ""){
+                    alert("Ürün Id Giriniz");
+                    return;
+                }
+                if(inputValues[1].value == ""){
+                    alert("Ürün Adı Giriniz");
+                    return;
+                }
+                if(inputValues[2].value == ""){
+                    alert("Ürün Detayı girin");
+                    return;
+                }
+                if(inputValues[3].value == ""){
+                    alert("Ürün fiyatı girin");
+                    return;
+                }
+
+
+                addNewProduct(inputValues[0].value, "0", inputValues[1].value, inputValues[2].value, inputValues[3].value)
+            });
+
+    })
+
+
+    async function getCurrentAccount() {
+            //console.log(await window.web3.givenProvider.selectedAddress);
+            //const accounts = await window.web3.eth.getAccounts();
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            console.log("Selected account: " + accounts);
+            const account = accounts[0];
+            return accounts[0];
+    }
+
+
+    async function addNewProduct(productId, secretId, productName, productDetails, price) {
+            updateStatus(`Adding new product ${productName}`);
+            const account = await getCurrentAccount();
+
+
+            var latestBlock = await web3.eth.getBlock('latest');
+            var timeStamp = latestBlock.timestamp //Şimdilik en son bloğun tarihi ekleniyor
+
+            //Geliştirme aşaması için product Id'den üretildi, daha sonra parametreye bağlanacak
+            var tempSecretId = web3.utils.fromAscii(productId); //web3.utils.toAscii(productId)
+
+            console.log("productId: ",productId);
+            console.log("tempSecretId: ",tempSecretId);
+            console.log("productName: ",productName);
+            console.log("productDetails: ",productDetails);
+            console.log("price: ",price);
+            console.log("timeStamp: ",timeStamp);
+            try{
+                const response = await window.contract.methods.addProduct(productId, tempSecretId, price, productName, productDetails, timeStamp).send({ from: account, gas:3000000 });
+                updateStatus('New product ' + productName + ' added!');
+                changeAlert(true);
+            }catch(error){
+                console.log(error);
+                response = error.message;
+                updateStatus(response);
+                changeAlert(false);
+            }
+    }
+
+
+    async function getRndInteger(min, max) {
+        return Math.floor(Math.random() * (max - min) ) + min;
+    }
+    
+</script>
+</body>
+<footer>
+
+
+</footer>
+</html>

@@ -144,7 +144,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -202,7 +203,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -328,7 +330,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -341,7 +344,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     }
   ],
   "metadata": "{\"compiler\":{\"version\":\"0.8.13+commit.abaa5c0e\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"setter\",\"type\":\"address\"}],\"name\":\"constructorSet\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"productId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"newProductAdded\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"seller\",\"type\":\"address\"}],\"name\":\"newSellerRegistered\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"buyer\",\"type\":\"address\"}],\"name\":\"productPurchased\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"productId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"buyer\",\"type\":\"address\"}],\"name\":\"productPurchasedByConsumer\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"productId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"seller\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"buyer\",\"type\":\"address\"}],\"name\":\"productSoldSuccessfully\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_productId\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_secretId\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"_price\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"_name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"_details\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"_productionDate\",\"type\":\"uint256\"}],\"name\":\"addProduct\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_secretId\",\"type\":\"bytes32\"}],\"name\":\"buyProduct\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getAllOwnedProducts\",\"outputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"productId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"price\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"bool\",\"name\":\"isSold\",\"type\":\"bool\"},{\"internalType\":\"string\",\"name\":\"details\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"productionDate\",\"type\":\"uint256\"}],\"internalType\":\"struct ProductScan.Product[]\",\"name\":\"\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_productId\",\"type\":\"uint256\"}],\"name\":\"productDetails\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"details\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"price\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"isSold\",\"type\":\"bool\"},{\"internalType\":\"string\",\"name\":\"isOriginal\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"productLength\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_productArrayLength\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_productId\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"_buyerAddress\",\"type\":\"address\"}],\"name\":\"sellProduct\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"owner()\":{\"details\":\"Returns the address of the current owner.\"},\"transferOwnership(address)\":{\"details\":\"Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner.\"}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/ProductScan.sol\":\"ProductScan\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/Ownership.sol\":{\"keccak256\":\"0x02b99eb9ed8b04ba1b299b0209ddd9e2d5c5277605885d2b43ab21cfce6ec47a\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://17a4910f529367549cc814aff824533d1dc306208def30170665a4cfbd6ed65b\",\"dweb:/ipfs/QmTZ9x6vWk1kNVt9QMWDju8Hbu9Xkk5oNodvAchdWjKqzw\"]},\"project:/contracts/ProductScan.sol\":{\"keccak256\":\"0x68742d64615a7471ce76e43d53b19a6090d4f4502260514351bd8507dab1ef7a\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://25abdaed1d27277007eb6ac72d7f7c95601ce1aafaebf9c20fac646beab70850\",\"dweb:/ipfs/QmT4UBoxWuikC838KmsMf9SErj1McmNtiSKWap7wM1mSDz\"]},\"project:/contracts/context.sol\":{\"keccak256\":\"0x5d3c7979f911be957afc9b69b27a9a301a6177afa4adb85e193bd7b72bac1b81\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://c2a0fffc2c1be297302b0923755cf49a180fac7e3caeba96b662f525da3e80e0\",\"dweb:/ipfs/QmdZ8uURLnPedywD8fW97sXd1wXkHihFqvQTPmhe8QoWqR\"]}},\"version\":1}",
@@ -27836,14 +27840,143 @@
   },
   "networks": {
     "5777": {
-      "events": {},
+      "events": {
+        "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
+          "type": "event"
+        },
+        "0x554313c8aee45460ac12e0a92818ed96443f15b4b0b008141f8db8c3f5fa6eef": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "setter",
+              "type": "address"
+            }
+          ],
+          "name": "constructorSet",
+          "type": "event"
+        },
+        "0xbd8ac5c2f6ef8dd241a94a60d0a2a959593fc3457eda34e09a7d4f605366365c": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "productId",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "owner",
+              "type": "address"
+            }
+          ],
+          "name": "newProductAdded",
+          "type": "event"
+        },
+        "0xc0e3a1418d09208edafdb4d540cdf156f1501473f19083535aa9886cec492b49": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "seller",
+              "type": "address"
+            }
+          ],
+          "name": "newSellerRegistered",
+          "type": "event"
+        },
+        "0xf162f49f8c5f896aa8e830aa684072ba77ada19a8dd8596b9d3b38a8b0d4b528": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "buyer",
+              "type": "address"
+            }
+          ],
+          "name": "productPurchased",
+          "type": "event"
+        },
+        "0x53b435a434268e3562a0a9c12fa3245e841643c0a168cc7fff1fac5de6b30e90": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "productId",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "buyer",
+              "type": "address"
+            }
+          ],
+          "name": "productPurchasedByConsumer",
+          "type": "event"
+        },
+        "0xf97c1f1de80ef41c13355fa2353dfcae96536bdf6fd7db677dc26d63bf92c6d8": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "productId",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "seller",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "buyer",
+              "type": "address"
+            }
+          ],
+          "name": "productSoldSuccessfully",
+          "type": "event"
+        }
+      },
       "links": {},
-      "address": "0xE7E14a458b53f34F125C09901Ad6841448b73797",
-      "transactionHash": "0x88ee650b9ebe8f1b1032fbd28a34fa39ae653dd52449d96810f92ff1a1261a79"
+      "address": "0x6e62D040D38637D8bd5B4a20d5083Df0d3F1b2B4",
+      "transactionHash": "0xdebb732c368a55c12c669512225e722084d32c785fb8126c7df44bc8916a8838"
     }
   },
   "schemaVersion": "3.4.6",
-  "updatedAt": "2023-01-07T10:43:56.268Z",
+  "updatedAt": "2023-01-07T12:50:29.559Z",
+  "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
     "methods": {

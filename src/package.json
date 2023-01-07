@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "bootstrap": "^5.2.3",
+    "html5-qrcode": "^2.3.4",
+    "jquery": "^3.6.3",
+    "web3": "^1.8.1"
+  }
+}

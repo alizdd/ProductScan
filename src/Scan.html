@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Web 3 Bagış</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <script src='abi.js'></script>
+
+    <script src='node_modules/web3/dist/web3.min.js'></script>
+    <script src='node_modules/html5-qrcode/html5-qrcode.min.js'></script>
+    <script src='node_modules/jquery/dist/jquery.min.js'></script>
+    <script src='node_modules/jquery/dist/jquery.slim.min.js'></script>
+    <script src='node_modules/bootstrap/dist/js/bootstrap.min.js'></script>
+
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+
+<style>
+    .panel, .panel-body, .panel-footer, .panel-heading  {
+        padding: 15px;
+      }
+</style>
+</head>
+<body>
+    <div class="alert alert-success" role="alert"> Status: <span id="status">Loading...</span></div>
+
+
+
+
+
+    <script type="text/javascript">
+        //WEB3 INIT
+        load();
+    
+        async function loadWeb3() {
+            //Metamask cüzdanını aktifleştirir
+            if (window.ethereum) {
+                window.web3 = new Web3('HTTP://127.0.0.1:9545');
+                window.ethereum.enable();
+            }
+        }
+    
+        async function loadContract() {
+            return await new window.web3.eth.Contract(abi, '0x6e62D040D38637D8bd5B4a20d5083Df0d3F1b2B4');
+        }
+    
+        async function load() {
+            await loadWeb3();
+            window.contract = await loadContract();
+            console.log("window.contract");
+            console.log(window.contract);
+            await updateStatus('Ready!');
+        }
+    
+        async function updateStatus(status) {
+            const statusEl = document.getElementById('status');
+            statusEl.innerHTML = status;
+            console.log(status);
+            await changeAlert(true);
+        }
+
+
+        //Status divinin cssi güncellenir
+        async function changeAlert(isSuccess){
+            if($("[role='alert']").hasClass("alert-success")){
+                if(isSuccess){
+                    return;
+                }
+                $("[role='alert']").removeClass("alert-success");
+                $("[role='alert']").addClass("alert-danger");
+            }
+            else{
+                if(!isSuccess){
+                    return;
+                }
+                $("[role='alert']").addClass("alert-success");
+                $("[role='alert']").removeClass("alert-danger");
+            }
+        }
+    
+    </script>
+
+
+    <script type="text/javascript">
+
+    </script>
+</body>
+<footer>
+
+
+</footer>
+</html>
