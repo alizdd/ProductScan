@@ -250,7 +250,8 @@ contract ProductScan is Ownership {
             string memory details,
             uint256 price,
             bool isSold,
-            string memory isOriginal
+            string memory isOriginal,
+            uint productionDate
         )
     {
         uint256 index = productIdToProductIndex[_productId];
@@ -258,10 +259,10 @@ contract ProductScan is Ownership {
         address ownerAddress = productToOwner[_productId];
 
         if(ownerAddress != address(0x0)){
-            return (tP.name, tP.details, tP.price, tP.isSold, "Original");
+            return (tP.name, tP.details, tP.price, tP.isSold, "Original", tP.productionDate);
         }
         else{
-            return ("NA", "NA", 0, false, "Fake");
+            return ("NA", "NA", 0, false, "Fake", 0);
         }
         
     }

@@ -19,18 +19,23 @@
     .panel, .panel-body, .panel-footer, .panel-heading  {
         padding: 15px;
       }
+    .qr-code {
+      max-width: 200px;
+      margin: 10px;
+    }
 </style>
 </head>
 <body>
     <div class="container">
         <div class="alert alert-success" role="alert"> Status: <span id="status">Loading...</span></div>
         <div class="row">
-            <div class="panel panel-info" style="width:100%">
+            <div class="panel panel-default" style="width:100%;">
                 <div class="panel-heading">
-                    <h3>Sözleşmeye Ürün Ekleyin</h3>
+                    <button class="btn btn-success" type="button" id="ShowAddProductBtn">Sözleşmeye Ürün Ekleyin</button>
+                    <button class="btn btn-primary" type="button" id="GetMyProductsBtn">Ürünlerimi Göster</button>
                 </div>
-                <div class="panel-body">
-                    <form id="AddNewProduct">
+                <div class="panel-body" >
+                    <form style="display:none;" id="AddNewProduct">
                         <div class="col-2"><label for="ProductId">Ürün Id:</label></div>
                         <div class="col-10"><input type="text" id="ProductId" name="ProductId"><br></div>
                         
@@ -49,11 +54,40 @@
                         <br>
                         <input class="btn btn-success" type="submit" value="Onayla">
                       </form>
+                      <div class="row" style="margin-top:14px;" id="myProductsDiv">
+
+                      </div>
                 </div>
             </div>
         </div>
+
     </div>
-    
+    <div id="barcodeModal" class="modal fade" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+                
+              <h4 class="modal-title" id="modalHeader"></h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="text-align: center;">
+              <h3 id="modalBodyText"></h3>
+              <!-- Get a Placeholder image initially,
+       this will change according to the
+       data entered later -->
+                <img src=
+      "https://chart.googleapis.com/chart?cht=qr&chl=Hello+World&chs=160x160&chld=L|0"
+              class="qr-code img-thumbnail img-responsive" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+      
+        </div>
+      </div>
 
 
 <script type="text/javascript" async>
@@ -136,6 +170,23 @@
                 addNewProduct(inputValues[0].value, "0", inputValues[1].value, inputValues[2].value, inputValues[3].value)
             });
 
+
+            $('#ShowAddProductBtn').click(function(e){
+                if($('#AddNewProduct').is(":hidden")){
+                    $('#AddNewProduct').show();
+                    $('#ShowAddProductBtn').html("Gizle");
+                }
+                else{
+                    $('#AddNewProduct').hide();
+                    $('#ShowAddProductBtn').html("Sözleşmeye Ürün Ekle");
+                }
+
+            });
+
+            $('#GetMyProductsBtn').click(async function(e){
+                await getMyProducts();
+            });
+
     })
 
 
@@ -155,7 +206,8 @@
 
 
             var latestBlock = await web3.eth.getBlock('latest');
-            var timeStamp = latestBlock.timestamp //Şimdilik en son bloğun tarihi ekleniyor
+            //Geliştirme aşaması için Şimdilik en son bloğun tarihi ekleniyor
+            var timeStamp = latestBlock.timestamp 
 
             //Geliştirme aşaması için product Id'den üretildi, daha sonra parametreye bağlanacak
             var tempSecretId = web3.utils.fromAscii(productId); //web3.utils.toAscii(productId)
@@ -167,7 +219,7 @@
             console.log("price: ",price);
             console.log("timeStamp: ",timeStamp);
             try{
-                const response = await window.contract.methods.addProduct(productId, tempSecretId, price, productName, productDetails, timeStamp).send({ from: account, gas:3000000 });
+                const response = await window.contract.methods.addProduct(productId, tempSecretId, price, productName, productDetails, timeStamp).send({ from: account, gas: 3000000 });
                 updateStatus('New product ' + productName + ' added!');
                 changeAlert(true);
             }catch(error){
@@ -178,11 +230,66 @@
             }
     }
 
+    async function getMyProducts() {
+            updateStatus(`Getting your products...`);
+            const account = await getCurrentAccount();
+
+            try{
+                const response = await window.contract.methods.getAllOwnedProducts().call({ from: account });
+
+                $('#myProductsDiv').html('');
+                for (let index = 0; index < response.length; index++) {
+                    var _details = response[index].details;
+                    var _isSold = response[index].isSold;
+                    var _name = response[index].name;
+                    var _price = response[index].price;
+                    var _productId = response[index].productId;
+                    var _productionDate = response[index].productionDate;
+
+                    var tempDate = new Date(_productionDate * 1000);
+                    var parsedDate = tempDate.toUTCString();
+
+                    $('#myProductsDiv').append('<div class="card" style="width: 18rem;"><div class="card-body"><h5 class="card-title">Product Name: '+ _name +'</h5><h6 class="card-subtitle mb-2 text-muted"><b>Product Id:</b> ' + _productId + '</h6><p class="card-text"><b>Details:</b> ' + _details + '<br><b>Production Date:</b> ' + parsedDate + '<br><b>Price: </b>' + _price + '$</p><a href="#" onclick="getProductBarcode(' + _productId + ',\'' + _name + '\')" class="card-link">Get Barcode</a></div></div>');
+                }
+
+                console.log(response);
+
+                updateStatus(`Successfully got your products!`);
+                changeAlert(true);
+            }catch(error){
+                $('#myProductsDiv').html('');
+                console.log(error);
+                response = error.message;
+                updateStatus(response);
+                changeAlert(false);
+            }
+    }
+
+    async function getProductBarcode(productId, productName){
+        //console.log(htmlEncode('http://192.168.1.36:5500/src/Scan.html?productId=' + productId));
+
+        let finalURL =
+        'https://chart.googleapis.com/chart?cht=qr' +
+          '&chs=160x160&chld=L|0&chl=' + htmlEncode('http://192.168.1.36:5500/src/Scan.html?productId=' + productId);
+  
+        // Replace the src of the image with
+        // the QR code image
+        $('.qr-code').attr('src', finalURL);
+
+        $('#modalHeader').html(productName);
+        $('#modalBodyText').html('Product Id: ' + productId);
+        $("#barcodeModal").modal("show");
+
+    }
+
 
     async function getRndInteger(min, max) {
         return Math.floor(Math.random() * (max - min) ) + min;
     }
-    
+
+    function htmlEncode(value) {
+      return $('<div/>').text(value).html();
+    }
 </script>
 </body>
 <footer>

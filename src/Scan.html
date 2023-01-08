@@ -24,7 +24,15 @@
 <body>
     <div class="alert alert-success" role="alert"> Status: <span id="status">Loading...</span></div>
 
+    <div class="container">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="row" id="ProductDetails">
 
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 
@@ -77,12 +85,68 @@
                 $("[role='alert']").removeClass("alert-danger");
             }
         }
-    
+
     </script>
 
 
     <script type="text/javascript">
+        $(document).ready(async function(){
+            const params = new Proxy(new URLSearchParams(window.location.search), {
+                get: (searchParams, prop) => searchParams.get(prop),
+            });
+            // Get the value of "some_key" in eg "https://example.com/?some_key=some_value"
+            let value = params.productId; // "some_value"
 
+            await getProductDetails(value);
+        });
+
+        async function getCurrentAccount() {
+            //console.log(await window.web3.givenProvider.selectedAddress);
+            //const accounts = await window.web3.eth.getAccounts();
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            console.log("Selected account: " + accounts);
+            const account = accounts[0];
+            return accounts[0];
+        }
+        
+
+        async function getProductDetails(productId){
+            updateStatus(`Scanning the QR code...`);
+            const account = await getCurrentAccount();
+
+            try{
+                const response = await window.contract.methods.productDetails(productId).call({ from: account });
+
+                $('#ProductDetails').html('');
+
+                var _productionDate = response.productionDate;
+
+                var tempDate = new Date(_productionDate * 1000);
+                var parsedDate = tempDate.toUTCString();
+
+                var isOriginal = response.isOriginal === 'Fake' ? false : true;
+
+                if(isOriginal){
+                    $('#ProductDetails').append('<div class="card" style="width: 18rem;"><div class="card-body"><h5 class="card-title">Product Name: '+ response.name +'</h5><h6 class="card-subtitle mb-2 text-muted"><b>Product Id:</b> ' + productId + '</h6><p class="card-text"><b>Details:</b> ' + response.details + '<br><b>Production Date:</b> ' + parsedDate + '<br><span class="alert alert-warning" style="display:inherit;"><b>Is Sold:</b> ' + (response.isSold ? 'SOLD' : 'NOT SOLD') + '</span><b>Price: </b>' + response.price + '$</p></div></div>');
+                }
+                else{
+                    $('#ProductDetails').append('<span class="alert alert-danger">PRODUCT IS FAKE OR NOT ADDED TO THE CONTRACT!</span>');
+                }
+                
+
+                console.log(response);
+
+                updateStatus(`Scan successfully completed!`);
+                changeAlert(true);
+            }catch(error){
+                $('#ProductDetails').html('');
+                console.log(error);
+                response = error.message;
+                updateStatus(response);
+                changeAlert(false);
+            }
+        }
+        
     </script>
 </body>
 <footer>

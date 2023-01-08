@@ -4,9 +4,8 @@
 
 
 
-Uygulama için indirilmesi gereken kütüphaneler:
+Uygulama için indirilmesi gereken kütüphaneler:<br>
 
-npm install web3
-npm install bootstrap
-npm install jquery
-npm install html5-qrcode
+npm install web3<br>
+npm install bootstrap<br>
+npm install jquery<br>
