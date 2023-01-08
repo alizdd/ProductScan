@@ -6,8 +6,6 @@ contract ProductScan is Ownership {
 
     //ürünler
     Product[] private products;
-    //Satıcılar
-    //SellerInfo[] private sellers;
 
     //Ürün
     struct Product {
@@ -65,8 +63,6 @@ contract ProductScan is Ownership {
     );
     event productPurchasedByConsumer(uint256 productId, address buyer);
 
-    event newSellerRegistered(string name, address seller);
-
 
 
     modifier sellerCheck(uint256 _productId) {
@@ -86,18 +82,6 @@ contract ProductScan is Ownership {
         require(isSold == false, "product is already sold");
         _;
     }
-
-    // modifier onlySideContract() {
-    //     require(msg.sender == sideContract, "You are not side contract");
-    //     require(sideContract != address(0), "side contract is not set yet");
-    //     _;
-    // }
-
-    // function getAllProducts() public view returns (Product[] memory){
-    //     require(products.length > 0, "There are no products");
-
-    //     return products;
-    // }
 
 
     function getAllOwnedProducts() public view returns (Product[] memory) {
@@ -141,21 +125,13 @@ contract ProductScan is Ownership {
         ownerProductCount[msg.sender]++;
 
         //Diziye ürün ekleme:
-        // uint256 productId;
-        // uint256 price;
-        // string name;
-        // bool isSold;
-        // string details;
-        // //Tarihler 1970'ten bu yana gelen saniyeler ile hesaplanır!!!
-        // uint productionDate;
         products.push(Product(_productId, _price, _name, false, _details, _productionDate));
 
-        //setting index in mappings
+        //Ürünün indexi güncellenir
         productIdToProductIndex[_productId] = products.length - 1;
         secretIdToProductIndex[_secretId] = products.length - 1;
 
         emit newProductAdded(_productId, msg.sender);
-
         return true;
     }
 
@@ -164,33 +140,27 @@ contract ProductScan is Ownership {
         external
         returns (bool)
     {
-        //onlySideContract
-        // finding product index using secret id from the in the common storage...
+        //secret Id ile index alınır
         uint256 productIndex = secretIdToProductIndex[_secretId];
-        // productId from product
+        //ilgili index ile ürünün id'si çekilebilir
         uint256 productId = products[productIndex].productId;
-        // product current owner from productId
+        //ürünün sahibi var mı kontrol etmek için sahip adres çekilir
         address productOwner = productToOwner[productId];
-
-
         //Böyle bir ürün var mı yok mu?
         require(
             productOwner != address(0x0),
             "There is no product with the given secretId"
         );
-
         //Satışta bir ürün var mı yok mu?
         require(
             ownerProductCount[productOwner] > 0,
             "Seller product count is 0"
         );
-
         //Ürün satın alındı mı?
         require(
             products[productIndex].isSold == false,
             "Product is already sold, Secret id is scanned before"
         );
-
         // Ürün satın alındı olarak işaretlenir.
         products[productIndex].isSold = true;
         productToOwner[productId] = msg.sender;
@@ -204,7 +174,6 @@ contract ProductScan is Ownership {
     }
 
 
-    // should be called for reselling
     function sellProduct(uint256 _productId, address _buyerAddress)
         external
         sellerCheck(_productId)
@@ -257,7 +226,7 @@ contract ProductScan is Ownership {
         uint256 index = productIdToProductIndex[_productId];
         Product memory tP = products[index];
         address ownerAddress = productToOwner[_productId];
-
+        //Ürünün sahibi bir adres yoksa daha önce böyle bir kayıt oluşturulmamıştır
         if(ownerAddress != address(0x0)){
             return (tP.name, tP.details, tP.price, tP.isSold, "Original", tP.productionDate);
         }
