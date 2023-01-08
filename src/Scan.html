@@ -3,7 +3,7 @@
 <head>
     <meta charset='utf-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <title>Web 3 Bagış</title>
+    <title>Web 3 Product Scan</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <script src='abi.js'></script>
 
@@ -21,10 +21,9 @@
       }
 </style>
 </head>
-<body>
-    <div class="alert alert-success" role="alert"> Status: <span id="status">Loading...</span></div>
-
+<body>    
     <div class="container">
+        <div class="alert alert-success" role="alert"> Status: <span id="status">Loading...</span></div>
         <div class="panel panel-default">
             <div class="panel-body">
                 <div class="row" id="ProductDetails">
@@ -115,6 +114,19 @@
             const account = await getCurrentAccount();
 
             try{
+                //GAZ ÜCRETİ HESABI İÇİN
+                const resGasMethod = await window.contract.methods.productDetails(productId).estimateGas({ from: account });
+                const gasPrice = await web3.eth.getGasPrice(); //gaz ücreti
+                const finalGas = (gasPrice * resGasMethod); //fonksiyonda kullanılacak ücret
+                const finalGasInEther = web3.utils.fromWei(finalGas.toString(), 'ether'); //ücretin ether karşılığı
+
+                console.log("Gas Price: ", gasPrice); // gaz ücreti
+                console.log("Estimated Gas: ", resGasMethod);
+                console.log("Final Gas: ", finalGas);
+                console.log("Gas in Ether: ", finalGasInEther);
+                //------
+
+                
                 const response = await window.contract.methods.productDetails(productId).call({ from: account });
 
                 $('#ProductDetails').html('');

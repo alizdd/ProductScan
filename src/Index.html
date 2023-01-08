@@ -3,7 +3,7 @@
 <head>
     <meta charset='utf-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <title>Web 3 Bagış</title>
+    <title>Web 3 Product Scan</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <script src='abi.js'></script>
 
@@ -143,8 +143,6 @@
 <script>
     $(document).ready(function(){
             var $formAdd=$('#AddNewProduct');
-
-            console.log($formAdd);
             $formAdd.submit(function(e){
                 e.preventDefault();
 
@@ -219,7 +217,24 @@
             console.log("price: ",price);
             console.log("timeStamp: ",timeStamp);
             try{
+
+                //GAZ ÜCRETİ HESABI İÇİN
+                const resGasMethod = await window.contract.methods.addProduct(productId, tempSecretId, price, productName, productDetails, timeStamp).estimateGas({ from: account, gas: 3000000 });
+                const gasPrice = await web3.eth.getGasPrice(); //gaz ücreti
+                const finalGas = (gasPrice * resGasMethod); //fonksiyonda kullanılacak ücret
+                const finalGasInEther = web3.utils.fromWei(finalGas.toString(), 'ether'); //ücretin ether karşılığı
+
+                console.log("Gas Price: ", gasPrice); // gaz ücreti
+                console.log("Estimated Gas: ", resGasMethod);
+                console.log("Final Gas: ", finalGas);
+                console.log("Gas in Ether: ", finalGasInEther);
+                //------
+
+
+
+
                 const response = await window.contract.methods.addProduct(productId, tempSecretId, price, productName, productDetails, timeStamp).send({ from: account, gas: 3000000 });
+                console.log("addNewProduct response: ", response);
                 updateStatus('New product ' + productName + ' added!');
                 changeAlert(true);
             }catch(error){
@@ -235,7 +250,21 @@
             const account = await getCurrentAccount();
 
             try{
+                //GAZ ÜCRETİ HESABI İÇİN
+                const resGasMethod = await window.contract.methods.getAllOwnedProducts().estimateGas({ from: account });
+                const gasPrice = await web3.eth.getGasPrice(); //gaz ücreti
+                const finalGas = (gasPrice * resGasMethod); //fonksiyonda kullanılacak ücret
+                const finalGasInEther = web3.utils.fromWei(finalGas.toString(), 'ether'); //ücretin ether karşılığı
+
+                console.log("Gas Price: ", gasPrice); // gaz ücreti
+                console.log("Estimated Gas: ", resGasMethod);
+                console.log("Final Gas: ", finalGas);
+                console.log("Gas in Ether: ", finalGasInEther);
+                //------
+
                 const response = await window.contract.methods.getAllOwnedProducts().call({ from: account });
+
+
 
                 $('#myProductsDiv').html('');
                 for (let index = 0; index < response.length; index++) {
@@ -249,10 +278,10 @@
                     var tempDate = new Date(_productionDate * 1000);
                     var parsedDate = tempDate.toUTCString();
 
-                    $('#myProductsDiv').append('<div class="card" style="width: 18rem;"><div class="card-body"><h5 class="card-title">Product Name: '+ _name +'</h5><h6 class="card-subtitle mb-2 text-muted"><b>Product Id:</b> ' + _productId + '</h6><p class="card-text"><b>Details:</b> ' + _details + '<br><b>Production Date:</b> ' + parsedDate + '<br><b>Price: </b>' + _price + '$</p><a href="#" onclick="getProductBarcode(' + _productId + ',\'' + _name + '\')" class="card-link">Get Barcode</a></div></div>');
+                    $('#myProductsDiv').append('<div class="card" style="width: 18rem;"><div class="card-body"><h5 class="card-title"><b>Product Name:</b> '+ _name +'</h5><h6 class="card-subtitle mb-2 text-muted"><b>Product Id:</b> ' + _productId + '</h6><p class="card-text"><b>Details:</b> ' + _details + '<br><b>Production Date:</b> ' + parsedDate + '<br><b>Price: </b>' + _price + '$</p><a href="#" onclick="getProductBarcode(' + _productId + ',\'' + _name + '\')" class="card-link">Get Barcode</a></div></div>');
                 }
 
-                console.log(response);
+                console.log("getMyProducts response: ", response);
 
                 updateStatus(`Successfully got your products!`);
                 changeAlert(true);
